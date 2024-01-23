@@ -1,0 +1,68 @@
+#MENU GESTION USUARIO ACTIVE DIRECTORY
+
+function menu {
+@"
+-----------------------------
+MENU DE GESTION DE USUARIOS |
+Y EQUIPOS DE AD             |
+----------------------------|
+                            |
+1. LISTAR OU                |
+2. CREAR OU                 |
+3. LISTAR USUARIOS DE AD    |
+4. CREAR USUARIO            |
+5. LISTAR GRUPOS            |
+6. CREAR GRUPO              |
+7. AGREGAR MIEMBRO AL GRUPO |
+0. SALIR                    |
+-----------------------------
+"@
+
+}
+
+
+do {
+    menu
+    $opcion = Read-Host "Elija una opcion entre 1 - 7 o pulse 0 para SALIR"
+
+    switch($opcion) {
+        1{
+            Get-ADOrganizationalUnit -Filter * -SearchBase "DC=JuanJose2324,DC=sistemas" | Select-Object name | Out-Host
+        }
+        2{
+            $nombreOU = Read-Host "Nombre de la OU"
+            $path = "DC=JuanJose2324,DC=sistemas"
+            New-ADOrganizationalUnit -Name $nombreOU -Path $path
+        }
+        3{
+            Get-ADuser -Filter * -SearchBase "DC=JuanJose2324,DC=sistemas" | Select-Object name | Out-Host
+        }
+        4{
+            $nombreUsuario = Read-Host "Introduzca nombre de usuario"
+            $contrasenaUsuario = Read-Host "Introduzca la contraseña"
+#            $opcionou = Read-Host "Introduzca el nombre de la unidad organizativa"
+            New-ADUser -Name $nombreUsuario -SamAccountName $nombreUsuario -Enabled $true -AccountPassword (ConvertTo-SecureString $contrasenaUsuario -AsPlainText -Force)
+        }
+        5{
+            Get-ADgroup -Filter * -SearchBase "DC=JuanJose2324,DC=sistemas" | Select-Object name | Out-Host
+        }
+        6{
+            $nombreGrupo = Read-Host "Nombre del grupo"
+            $nombreou = Read-Host "Introduzca nombre de la OU"
+            $path2 = "OU=$nombreOU,DC=JuanJose2324,DC=sistemas"
+            New-ADGroup -Name $nombreGrupo -SamAccountName $nombreGrupo -GroupScope Global -GroupCategory Security -Path $path2
+        }
+        7{
+            $nombreGrupo = Read-Host "Nombre del grupo"
+            $nombreUsuario = Read-Host "Introduzca nombre de usuario"
+            Add-ADGroupMember -Identity $nombreGrupo -Members $nombreUsuario
+        }
+        0{
+            Write-Host "SALIENDO DEL MENÚ"
+        }
+        default{
+            Write-Host "Opcion no válida"
+        }
+
+    }
+} while ($opcion -ne 0)
