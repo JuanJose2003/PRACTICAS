@@ -1,0 +1,38 @@
+#Nº DISCO
+$numdisk = Read-Host "Indique el nº de disco"
+$numdisk2 = Read-Host "Indique el nº de disco"
+#INFO SOBRE EL DISCO
+
+$disco =  Get-PhysicalDisk | Select-Object DeviceID, MediaType, Size | where {$_.DeviceID -eq $numdisk} 
+$disco2 =  Get-PhysicalDisk | Select-Object DeviceID, MediaType, Size | where {$_.DeviceID -eq $numdisk2}
+
+if ($disco -eq $null) {
+    Write-Host "No existe"
+} else {
+    $gb =  (Get-Disk -Number $numdisk | Select-Object Size).Size /1GB
+    Write-Host "Tamaño del disco $($disco.DeviceID): $gb GB"
+}
+
+
+if ($disco2 -eq $null) {
+    Write-Host "No existe"
+} else {
+    $gb =  (Get-Disk -Number $numdisk2 | Select-Object Size).Size /1GB
+    Write-Host "Tamaño del disco $($disco2.DeviceID): $gb GB"
+}
+
+#$volumen = Read-Host "Seleccione el nº de volumen"
+$letra = Read-Host "Indique la letra para el raid 0"
+
+@"
+    select disk $numdisk
+    clean
+    convert dynamic
+    select disk $numdisk2
+    clean
+    convert dynamic
+    select disk $numdisk
+    create volume stripe disk=$numdisk,$numdisk2
+    assign letter=$letra
+    format fs=ntfs quick
+"@ | diskpart
