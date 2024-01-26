@@ -1,0 +1,13 @@
+#Instalar el rol de Active Directory y las herramientas de administración
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+#Configurar el nombre del dominio y establecer el modo de operación
+$domainName = Read-Host "Introduzca el nombre del dominio"
+$contra = Read-Host "Introduzca la contraseña"
+$domainAdminPassword = ConvertTo-SecureString $contra -AsPlainText -Force
+
+Install-ADDSForest -DomainName $domainName -DomainMode WinThreshold -ForestMode WinThreshold -SafeModeAdministratorPassword $domainAdminPassword -Force:$true
+
+#Promover el servidor a controlador de dominio
+Install-ADDSDomainController -DomainName $domainName -SafeModeAdministratorPassword $domainAdminPassword -Force:$true
+
+Write-Host "El controlador de dominio se ha instalado y promovido correctamente."

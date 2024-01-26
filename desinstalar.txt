@@ -1,0 +1,14 @@
+#EL GET-CONTENT PERMITE LEER CADA LINEA DE UN ARCHIVO
+$programaselect = Get-Content -Path .\archivo.txt
+#AQUI SE CREA EL BUCLE QUE LLERA LINEA POR LINEA Y BUSCARÁ EL NOMBRE DEL PROGRAMA
+foreach ($progrma in $programaselect){
+    Write-Host "Desinstalando: $programa"
+    $desinstalar = winget search --name "$programa"
+    #SI EL PAQUETE HA SIDO ENCONTRADO, PROCEDERÁ A DESINSTALAR
+    if ($desinstalar){
+        winget uninstall --force --accept-source-agreements --name "$programa" -h
+        Write-Host "Los programas han sido desinstalados" 
+    } else {
+        Write-Host "No se han encontrado los programas"
+    }
+}
